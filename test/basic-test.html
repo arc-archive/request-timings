@@ -1,0 +1,112 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/test-helpers.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+
+    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../request-timings.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <request-timings></request-timings>
+      </template>
+    </test-fixture>
+
+    <script>
+    /* global suite, test, fixture, assert */
+    suite('basic', function() {
+      var element;
+      var timings;
+
+      setup(function() {
+        element = fixture('basic');
+        timings = {
+          startTime: 1483368432132,
+          blocked: 7.75,
+          dns: 279.38,
+          connect: 883.12,
+          ssl: 633.05,
+          send: 0.29,
+          wait: 649.88,
+          receive: 1.71
+        };
+      });
+
+      test('Should be initialized with 0 values', function() {
+        assert.equal(element.fullTime, 0);
+        assert.equal(element.connect, 0);
+        assert.equal(element.send, 0);
+        assert.equal(element.wait, 0);
+        assert.equal(element.receive, 0);
+      });
+
+      test('Should be initialized with -1 values', function() {
+        assert.equal(element.blocked, -1);
+        assert.equal(element.dns, -1);
+        assert.equal(element.ssl, -1);
+      });
+
+      test('Should compute total time', function() {
+        element.timings = timings;
+        // JS float computations can be tricky. The value is somethere
+        // between this values.
+        assert.isAbove(element.fullTime, 2455.18);
+        assert.isBelow(element.fullTime, 2455.19);
+      });
+
+      test('Should set blocked value', function() {
+        element.timings = timings;
+        assert.equal(element.blocked, timings.blocked);
+      });
+
+      test('Should set dns value', function() {
+        element.timings = timings;
+        assert.equal(element.dns, timings.dns);
+      });
+
+      test('Should set connect value', function() {
+        element.timings = timings;
+        assert.equal(element.connect, timings.connect);
+      });
+
+      test('Should set ssl value', function() {
+        element.timings = timings;
+        assert.equal(element.ssl, timings.ssl);
+      });
+
+      test('Should set send value', function() {
+        element.timings = timings;
+        assert.equal(element.send, timings.send);
+      });
+
+      test('Should set wait value', function() {
+        element.timings = timings;
+        assert.equal(element.wait, timings.wait);
+      });
+
+      test('Should set receive value', function() {
+        element.timings = timings;
+        assert.equal(element.receive, timings.receive);
+      });
+    });
+    </script>
+
+  </body>
+</html>
