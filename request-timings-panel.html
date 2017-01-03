@@ -152,8 +152,8 @@ Use `request-timings` properties an mixins to style the charts.
     observers: [
       '_redirectsChanged(redirects.*)',
       '_timingsChanged(timings.*)',
-      '_computeRequestTime(redirects)',
-      '_computeRequestTime(timings)'
+      '_computeRequestTime(redirects.*)',
+      '_computeRequestTime(timings.*)'
     ],
 
     _redirectsChanged: function() {
