@@ -92,8 +92,8 @@
         test(`Renders ${item} row`, (done) => {
           element.timings = timings;
           flush(() => {
-            const row = index + 2;
-            const node = element.shadowRoot.querySelector(`div:nth-of-type(${row})`);
+            const row = index + 1;
+            const node = element.shadowRoot.querySelectorAll(`:host > div`)[row];
             const display = getComputedStyle(node).display;
             assert.notEqual(display, 'none');
             done();
@@ -113,11 +113,9 @@
         test(`Rounds ${item[0]} value`, (done) => {
           element.timings = timings;
           flush(() => {
-            const row = index + 2;
-            const selector = `div:nth-of-type(${row}) .timing-value`;
-            // const label = element.shadowRoot.querySelector('div:nth-of-type(2) .timing-value');
-            console.log(selector);
-            const label = element.shadowRoot.querySelector(selector);
+            const row = index + 1;
+            const node = element.shadowRoot.querySelectorAll(`:host > div`)[row];
+            const label = node.querySelector('.timing-value');
             assert.equal(label.innerText, item[1] + ' ms');
             done();
           });
