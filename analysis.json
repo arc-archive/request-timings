@@ -4198,7 +4198,7 @@
       "tagname": "request-timings"
     },
     {
-      "description": "The `request-timings-panel` element is a panel to display a set of timings\nfor the request / response. The use case is to display timings for the request\nwhere redirects are possible and timings for the redirects are calculated.\n\nThe timings accepted by this element is defined in the HAR 1.2 spec. See The\n`request-timings` element docs for more info.\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--request-timings-panel` | Mixin applied to the element | `{}`\n`--arc-font-subhead` | Mixin applied to the headers element. Similar to `--paper-font-subhead` mixin in Paper elements. | `{}`\n\nUse `request-timings` properties an mixins to style the charts.",
+      "description": "The `request-timings-panel` element is a panel to display a set of timings\nfor the request / response. The use case is to display timings for the request\nwhere redirects are possible and timings for the redirects are calculated.\n\nThe timings accepted by this element is defined in the HAR 1.2 spec. See The\n`request-timings` element docs for more info.\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--request-timings-panel` | Mixin applied to the element | `{}`\n`--arc-font-subhead` | Mixin applied to the headers element. Similar to `--paper-font-subhead` mixin in Paper elements. | `{}`\n\nUse `request-timings` properties an mixins to style the charts.\n\n## Changes in version 2\n- `redirects` property rendamed to `redirectTimings`",
       "summary": "",
       "path": "request-timings-panel.html",
       "properties": [
@@ -4784,11 +4784,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 113,
+              "line": 117,
               "column": 8
             },
             "end": {
-              "line": 118,
+              "line": 122,
               "column": 9
             }
           },
@@ -4800,40 +4800,18 @@
           "defaultValue": "false"
         },
         {
-          "name": "hasTimings",
-          "type": "boolean",
-          "description": "Computed value, True if any request timings are available.",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 120,
-              "column": 8
-            },
-            "end": {
-              "line": 125,
-              "column": 9
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": true
-            }
-          },
-          "defaultValue": "false"
-        },
-        {
-          "name": "redirects",
+          "name": "redirectTimings",
           "type": "Array",
           "description": "An array of HAR 1.2 timings object.\nIt should contain a timings objects for any redirect object during\nthe request.\nList should be arelady ordered by the time of occurence.",
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 132,
+              "line": 129,
               "column": 8
             },
             "end": {
-              "line": 132,
-              "column": 24
+              "line": 129,
+              "column": 30
             }
           },
           "metadata": {
@@ -4847,11 +4825,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 134,
+              "line": 131,
               "column": 8
             },
             "end": {
-              "line": 134,
+              "line": 131,
               "column": 23
             }
           },
@@ -4862,15 +4840,15 @@
         {
           "name": "requestTotalTime",
           "type": "number",
-          "description": "Calculated total request time (final response + redirects).",
+          "description": "Calculated total request time (final response + redirectTimings).",
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 138,
+              "line": 135,
               "column": 8
             },
             "end": {
-              "line": 142,
+              "line": 139,
               "column": 9
             }
           },
@@ -7055,39 +7033,18 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 146,
+              "line": 143,
               "column": 4
             },
             "end": {
-              "line": 148,
+              "line": 145,
               "column": 5
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "redirects"
-            }
-          ]
-        },
-        {
-          "name": "_computeHasTimings",
-          "description": "",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 150,
-              "column": 4
-            },
-            "end": {
-              "line": 152,
-              "column": 5
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "timings"
+              "name": "record"
             }
           ]
         },
@@ -7097,21 +7054,21 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 154,
+              "line": 147,
               "column": 4
             },
             "end": {
-              "line": 165,
+              "line": 160,
               "column": 5
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "redirects"
+              "name": "redirectsRecord"
             },
             {
-              "name": "timings"
+              "name": "timingsRecord"
             }
           ]
         },
@@ -7121,11 +7078,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 167,
+              "line": 162,
               "column": 4
             },
             "end": {
-              "line": 169,
+              "line": 164,
               "column": 5
             }
           },
@@ -7142,11 +7099,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 171,
+              "line": 166,
               "column": 4
             },
             "end": {
-              "line": 215,
+              "line": 210,
               "column": 5
             }
           },
@@ -8102,11 +8059,11 @@
       "metadata": {},
       "sourceRange": {
         "start": {
-          "line": 108,
+          "line": 112,
           "column": 2
         },
         "end": {
-          "line": 216,
+          "line": 211,
           "column": 3
         }
       },
@@ -8119,11 +8076,11 @@
           "description": "Computed value, if true it will display redirects details",
           "sourceRange": {
             "start": {
-              "line": 113,
+              "line": 117,
               "column": 8
             },
             "end": {
-              "line": 118,
+              "line": 122,
               "column": 9
             }
           },
@@ -8131,32 +8088,16 @@
           "type": "boolean"
         },
         {
-          "name": "has-timings",
-          "description": "Computed value, True if any request timings are available.",
-          "sourceRange": {
-            "start": {
-              "line": 120,
-              "column": 8
-            },
-            "end": {
-              "line": 125,
-              "column": 9
-            }
-          },
-          "metadata": {},
-          "type": "boolean"
-        },
-        {
-          "name": "redirects",
+          "name": "redirect-timings",
           "description": "An array of HAR 1.2 timings object.\nIt should contain a timings objects for any redirect object during\nthe request.\nList should be arelady ordered by the time of occurence.",
           "sourceRange": {
             "start": {
-              "line": 132,
+              "line": 129,
               "column": 8
             },
             "end": {
-              "line": 132,
-              "column": 24
+              "line": 129,
+              "column": 30
             }
           },
           "metadata": {},
@@ -8167,11 +8108,11 @@
           "description": "The request / response HAR timings.",
           "sourceRange": {
             "start": {
-              "line": 134,
+              "line": 131,
               "column": 8
             },
             "end": {
-              "line": 134,
+              "line": 131,
               "column": 23
             }
           },
@@ -8180,14 +8121,14 @@
         },
         {
           "name": "request-total-time",
-          "description": "Calculated total request time (final response + redirects).",
+          "description": "Calculated total request time (final response + redirectTimings).",
           "sourceRange": {
             "start": {
-              "line": 138,
+              "line": 135,
               "column": 8
             },
             "end": {
-              "line": 142,
+              "line": 139,
               "column": 9
             }
           },

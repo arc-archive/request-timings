@@ -10,6 +10,7 @@
 
 /// <reference path="../polymer/types/polymer-element.d.ts" />
 /// <reference path="../polymer/types/lib/elements/dom-if.d.ts" />
+/// <reference path="../polymer/types/lib/elements/dom-repeat.d.ts" />
 /// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
 /// <reference path="request-timings.d.ts" />
 
@@ -29,6 +30,9 @@ declare namespace UiElements {
    * `--arc-font-subhead` | Mixin applied to the headers element. Similar to `--paper-font-subhead` mixin in Paper elements. | `{}`
    *
    * Use `request-timings` properties an mixins to style the charts.
+   *
+   * ## Changes in version 2
+   * - `redirects` property rendamed to `redirectTimings`
    */
   class RequestTimingsPanel extends Polymer.Element {
 
@@ -38,17 +42,12 @@ declare namespace UiElements {
     readonly hasRedirects: boolean|null|undefined;
 
     /**
-     * Computed value, True if any request timings are available.
-     */
-    readonly hasTimings: boolean|null|undefined;
-
-    /**
      * An array of HAR 1.2 timings object.
      * It should contain a timings objects for any redirect object during
      * the request.
      * List should be arelady ordered by the time of occurence.
      */
-    redirects: any[]|null|undefined;
+    redirectTimings: any[]|null|undefined;
 
     /**
      * The request / response HAR timings.
@@ -56,12 +55,11 @@ declare namespace UiElements {
     timings: object|null|undefined;
 
     /**
-     * Calculated total request time (final response + redirects).
+     * Calculated total request time (final response + redirectTimings).
      */
     readonly requestTotalTime: number|null|undefined;
-    _computeHasRedirects(redirects: any): any;
-    _computeHasTimings(timings: any): any;
-    _computeRequestTime(redirects: any, timings: any): any;
+    _computeHasRedirects(record: any): any;
+    _computeRequestTime(redirectsRecord: any, timingsRecord: any): any;
     _computeIndexName(index: any): any;
     _computeHarTime(har: any): any;
   }
