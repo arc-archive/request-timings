@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <link rel="import" href="../request-timings.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <request-timings></request-timings>
+      </template>
+    </test-fixture>
+
+    <script>
+    suite('basic', () => {
+      let element;
+      let timings;
+
+      setup(() => {
+        element = fixture('basic');
+        timings = {
+          startTime: 1483368432132,
+          blocked: 7.751456734,
+          dns: 279.3812349,
+          connect: 883.1201243,
+          ssl: 633.0517329,
+          send: 0.2900234,
+          wait: 649.8810009,
+          receive: 1.7121211
+        };
+      });
+
+      test('Sets default values', () => {
+        assert.equal(element.fullTime, 0);
+        assert.equal(element.connect, 0);
+        assert.equal(element.send, 0);
+        assert.equal(element.wait, 0);
+        assert.equal(element.receive, 0);
+        assert.equal(element.blocked, -1);
+        assert.equal(element.dns, -1);
+        assert.equal(element.ssl, -1);
+      });
+
+      test('Computes total time', () => {
+        element.timings = timings;
+        // JS float computations can be tricky. The value is somethere
+        // between this values.
+        assert.isAbove(element.fullTime, 2455.18);
+        assert.isBelow(element.fullTime, 2455.19);
+      });
+
+      test('Sets blocked time', () => {
+        element.timings = timings;
+        assert.equal(element.blocked, timings.blocked);
+      });
+
+      test('Sets dns time', () => {
+        element.timings = timings;
+        assert.equal(element.dns, timings.dns);
+      });
+
+      test('Sets connect time', () => {
+        element.timings = timings;
+        assert.equal(element.connect, timings.connect);
+      });
+
+      test('Sets ssl time', () => {
+        element.timings = timings;
+        assert.equal(element.ssl, timings.ssl);
+      });
+
+      test('Sets send time', () => {
+        element.timings = timings;
+        assert.equal(element.send, timings.send);
+      });
+
+      test('Sets wait time', () => {
+        element.timings = timings;
+        assert.equal(element.wait, timings.wait);
+      });
+
+      test('Sets receive time', () => {
+        element.timings = timings;
+        assert.equal(element.receive, timings.receive);
+      });
+
+      ['Queueing', 'DNS Lookup', 'Time to connect', 'SSL negotiation', 'Send time', 'Wait time (TTFB)', 'Content download'].forEach((item, index) => {
+        test(`Renders ${item} row`, (done) => {
+          element.timings = timings;
+          flush(() => {
+            const row = index + 2;
+            const node = element.shadowRoot.querySelector(`div:nth-of-type(${row})`);
+            const display = getComputedStyle(node).display;
+            assert.notEqual(display, 'none');
+            done();
+          });
+        });
+      });
+
+      [
+        ['Queueing', '7.7515'],
+        ['DNS Lookup', 279.3812],
+        ['Time to connect', 883.1201],
+        ['SSL negotiation', 633.0517],
+        ['Send time', 0.29],
+        ['Wait time (TTFB)', 649.881],
+        ['Content download', 1.7121]
+      ].forEach((item, index) => {
+        test(`Rounds ${item[0]} value`, (done) => {
+          element.timings = timings;
+          flush(() => {
+            const row = index + 2;
+            const selector = `div:nth-of-type(${row}) .timing-value`;
+            // const label = element.shadowRoot.querySelector('div:nth-of-type(2) .timing-value');
+            console.log(selector);
+            const label = element.shadowRoot.querySelector(selector);
+            assert.equal(label.innerText, item[1] + ' ms');
+            done();
+          });
+        });
+      });
+    });
+
+    a11ySuite('basic');
+    </script>
+
+  </body>
+</html>

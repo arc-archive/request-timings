@@ -76,65 +76,65 @@ the License.
       </div>
     </div>
     <div class="row" hidden$="[[!_hasValue(blocked)]]">
-      <div class="timing-label label" id="queueing">
+      <div class="timing-label label">
         Queueing:
       </div>
       <div class="timing-chart">
-        <paper-progress aria-labelledby="queueing" value="0" secondary-progress="[[blocked]]" max="[[fullTime]]" step="0.0001"></paper-progress>
+        <paper-progress aria-label="Queueing time" value="0" secondary-progress="[[blocked]]" max="[[fullTime]]" step="0.0001"></paper-progress>
       </div>
       <span class="timing-value">[[_round(blocked)]] ms</span>
     </div>
     <div class="row" hidden$="[[!_hasValue(dns)]]">
-      <div class="timing-label label" id="dnsLookup">
+      <div class="timing-label label">
         DNS Lookup:
       </div>
       <div class="timing-chart">
-        <paper-progress aria-labelledby="dnsLookup" value="[[_computeSum(blocked)]]" secondary-progress="[[_computeSum(blocked, dns)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
+        <paper-progress aria-label="DNS lookup time" value="[[_computeSum(blocked)]]" secondary-progress="[[_computeSum(blocked, dns)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
       </div>
       <span class="timing-value">[[_round(dns)]] ms</span>
     </div>
     <div class="row">
-      <div class="timing-label label" id="ttc">
+      <div class="timing-label label">
         Time to connect:
       </div>
       <div class="timing-chart">
-        <paper-progress aria-labelledby="ttc" value="[[_computeSum(blocked, dns)]]" secondary-progress="[[_computeSum(blocked, dns, connect)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
+        <paper-progress aria-label="Time to connect" value="[[_computeSum(blocked, dns)]]" secondary-progress="[[_computeSum(blocked, dns, connect)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
       </div>
       <span class="timing-value">[[_round(connect)]] ms</span>
     </div>
     <div class="row" hidden$="[[!_hasValue(ssl)]]">
-      <div class="timing-label label" id="ssl">
+      <div class="timing-label label">
         SSL negotiation:
       </div>
       <div class="timing-chart">
-        <paper-progress aria-labelledby="ssl" secondary-progress="[[_computeSum(blocked, dns, connect, ssl)]]" value="[[_computeSum(blocked, dns, connect)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
+        <paper-progress aria-label="SSL negotiation time" secondary-progress="[[_computeSum(blocked, dns, connect, ssl)]]" value="[[_computeSum(blocked, dns, connect)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
       </div>
       <span class="timing-value">[[_round(ssl)]] ms</span>
     </div>
     <div class="row">
-      <div class="timing-label label" id="sendTime">
+      <div class="timing-label label">
         Send time:
       </div>
       <div class="timing-chart">
-        <paper-progress aria-labelledby="sendTime" secondary-progress="[[_computeSum(blocked, dns, connect, ssl, send)]]" value="[[_computeSum(blocked, dns, connect, ssl)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
+        <paper-progress aria-label="Send time" secondary-progress="[[_computeSum(blocked, dns, connect, ssl, send)]]" value="[[_computeSum(blocked, dns, connect, ssl)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
       </div>
       <span class="timing-value">[[_round(send)]] ms</span>
     </div>
     <div class="row">
-      <div class="timing-label label" id="ttfb">
+      <div class="timing-label label">
         Wait time (TTFB):
       </div>
       <div class="timing-chart">
-        <paper-progress aria-labelledby="ttfb" secondary-progress="[[_computeSum(blocked, dns, connect, send, ssl, wait)]]" value="[[_computeSum(blocked, dns, connect, send, ssl)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
+        <paper-progress aria-label="Time to first byte" secondary-progress="[[_computeSum(blocked, dns, connect, send, ssl, wait)]]" value="[[_computeSum(blocked, dns, connect, send, ssl)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
       </div>
       <span class="timing-value">[[_round(wait)]] ms</span>
     </div>
     <div class="row">
-      <div class="timing-label label" id="receive">
+      <div class="timing-label label">
         Content download:
       </div>
       <div class="timing-chart">
-        <paper-progress aria-labelledby="receive" secondary-progress="[[_computeSum(blocked, dns, connect, send, ssl, wait, receive)]]" value="[[_computeSum(blocked, dns, connect, send, ssl, wait)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
+        <paper-progress aria-label="Receiving time" secondary-progress="[[_computeSum(blocked, dns, connect, send, ssl, wait, receive)]]" value="[[_computeSum(blocked, dns, connect, send, ssl, wait)]]" max="[[fullTime]]" step="0.0001"></paper-progress>
       </div>
       <span class="timing-value">[[_round(receive)]] ms</span>
     </div>
