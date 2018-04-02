@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright 2016 The Advanced REST client authors <arc@mulesoft.com>
+Copyright 2018 The Advanced REST client authors <arc@mulesoft.com>
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
 the License at
@@ -11,29 +11,10 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="request-timings.html">
-<!--
-
-The `request-timings-panel` element is a panel to display a set of timings
-for the request / response. The use case is to display timings for the request
-where redirects are possible and timings for the redirects are calculated.
-
-The timings accepted by this element is defined in the HAR 1.2 spec. See The
-`request-timings` element docs for more info.
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--request-timings-panel` | Mixin applied to the element | `{}`
-`--arc-font-subhead` | Mixin applied to the headers element. Similar to `--paper-font-subhead` mixin in Paper elements. | `{}`
-
-Use `request-timings` properties an mixins to style the charts.
-
-@group UI Elements
-@element request-timings-panel
-@demo demo/request-timings-panel.html
--->
 <dom-module id="request-timings-panel">
   <template>
     <style>
@@ -44,25 +25,25 @@ Use `request-timings` properties an mixins to style the charts.
 
     .status-row,
     .timings-row {
-      @apply(--layout-horizontal);
-      @apply(--layout-center);
+      @apply --layout-horizontal;
+      @apply --layout-center;
       min-height: 56px;
     }
 
     .status-row {
-      @apply(--layout-horizontal);
-      @apply(--layout-end-justified);
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
     }
 
     .sub-title {
-      @apply(--arc-font-subhead);
+      @apply --arc-font-subhead;
     }
 
     .status-label {
       width: 60px;
       font-size: var(--request-timings-panel-timing-total-size, 16px);
       font-weight: var(--request-timings-panel-timing-total-weigth, 400);
-      @apply(--arc-font-subhead);
+      @apply --arc-font-subhead;
     }
 
     .text {
@@ -72,7 +53,7 @@ Use `request-timings` properties an mixins to style the charts.
 
     .redirect-value {
       margin-top: 12px;
-      @apply(--layout-flex);
+      @apply --layout-flex;
     }
     </style>
     <template is="dom-if" if="[[hasRedirects]]" restamp>
@@ -105,108 +86,101 @@ Use `request-timings` properties an mixins to style the charts.
     </template>
   </template>
   <script>
-  Polymer({
-    is: 'request-timings-panel',
-    properties: {
-      // Computed value, if true it will display redirects details
-      hasRedirects: {
-        type: Boolean,
-        value: false,
-        readOnly: true
-      },
-      // Computed value, True if any request timings are available.
-      hasTimings: {
-        type: Boolean,
-        value: false,
-        readOnly: true
-      },
-      /**
-       * An array of HAR 1.2 timings object.
-       * It should contain a timings objects for any redirect object during
-       * the request.
-       * List should be arelady ordered by the time of occurence.
-       */
-      redirects: {
-        type: Array,
-        value: function() {
-          return [];
+  /**
+   * The `request-timings-panel` element is a panel to display a set of timings
+   * for the request / response. The use case is to display timings for the request
+   * where redirects are possible and timings for the redirects are calculated.
+   *
+   * The timings accepted by this element is defined in the HAR 1.2 spec. See The
+   * `request-timings` element docs for more info.
+   *
+   * Custom property | Description | Default
+   * ----------------|-------------|----------
+   * `--request-timings-panel` | Mixin applied to the element | `{}`
+   * `--arc-font-subhead` | Mixin applied to the headers element. Similar to `--paper-font-subhead` mixin in Paper elements. | `{}`
+   *
+   * Use `request-timings` properties an mixins to style the charts.
+   *
+   * @customElement
+   * @polymer
+   * @demo demo/index.html
+   * @memberof UiElements
+   */
+  class RequestTimingsPanel extends Polymer.Element {
+    static get is() { return 'request-timings-panel'; }
+    static get properties() {
+      return {
+        // Computed value, if true it will display redirects details
+        hasRedirects: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          computed: '_computeHasRedirects(redirects)'
+        },
+        // Computed value, True if any request timings are available.
+        hasTimings: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          computed: '_computeHasTimings(timings)'
+        },
+        /**
+         * An array of HAR 1.2 timings object.
+         * It should contain a timings objects for any redirect object during
+         * the request.
+         * List should be arelady ordered by the time of occurence.
+         */
+        redirects: Array,
+        // The request / response HAR timings.
+        timings: Object,
+        /**
+         * Calculated total request time (final response + redirects).
+         */
+        requestTotalTime: {
+          type: Number,
+          value: 0,
+          computed: '_computeRequestTime(redirects, timings)'
         }
-      },
-      // The request / response HAR timings.
-      timings: {
-        type: Object,
-        value: function() {
-          return {};
-        }
-      },
-      /**
-       * Calculated total request time (final response + redirects).
-       */
-      requestTotalTime: {
-        type: Number,
-        value: 0,
-        readOnly: true
-      }
-    },
+      };
+    }
 
-    observers: [
-      '_redirectsChanged(redirects.*)',
-      '_timingsChanged(timings.*)',
-      '_computeRequestTime(redirects.*)',
-      '_computeRequestTime(timings.*)'
-    ],
+    _computeHasRedirects(redirects) {
+      return !!(redirects && redirects.length);
+    }
 
-    _redirectsChanged: function() {
-      var rt = this.redirects;
-      if (!rt || !rt.length) {
-        this._setHasRedirects(false);
-      } else {
-        this._setHasRedirects(true);
-      }
-    },
-    // Handler for the timings change.
-    _timingsChanged: function() {
-      var rt = this.timings;
-      if (!rt) {
-        this._setHasTimings(false);
-      } else {
-        this._setHasTimings(true);
-      }
-    },
+    _computeHasTimings(timings) {
+      return !!(timings && timings.length);
+    }
 
-    _computeIndexName: function(index) {
-      return index + 1;
-    },
-
-    _computeRequestTime: function() {
-      var rt = this.redirects;
-      var timings = this.timings;
-      var time = 0;
-      if (!!rt && rt.length) {
-        rt.forEach(function(timing) {
-          time += this._computeHarTime(timing);
-        }, this);
+    _computeRequestTime(redirects, timings) {
+      let time = 0;
+      if (redirects && redirects.length) {
+        redirects.forEach((timing) => time += this._computeHarTime(timing));
       }
-      var add = this._computeHarTime(timings);
+      let add = this._computeHarTime(timings);
       if (add) {
         time += add;
       }
       time = Math.round(time * 10000) / 10000;
-      this._setRequestTotalTime(time);
-    },
+      return time;
+    }
 
-    _computeHarTime: function(har) {
-      var fullTime = 0;
+    _computeIndexName(index) {
+      return index + 1;
+    }
+
+    _computeHarTime(har) {
+      let fullTime = 0;
       if (!har) {
         return fullTime;
       }
-      var connect = Number(har.connect);
-      var receive = Number(har.receive);
-      var send = Number(har.send);
-      var wait = Number(har.wait);
-      var blocked = Number(har.blocked);
-      var dns = Number(har.dns);
-      var ssl = Number(har.ssl);
+      let connect = Number(har.connect);
+      let receive = Number(har.receive);
+      let send = Number(har.send);
+      let wait = Number(har.wait);
+      let blocked = Number(har.blocked);
+      let dns = Number(har.dns);
+      let ssl = Number(har.ssl);
       if (connect !== connect || connect < 0) {
         connect = 0;
       }
@@ -240,6 +214,7 @@ Use `request-timings` properties an mixins to style the charts.
       }
       return fullTime;
     }
-  });
+  }
+  window.customElements.define(RequestTimingsPanel.is, RequestTimingsPanel);
   </script>
 </dom-module>
