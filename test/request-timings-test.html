@@ -93,7 +93,7 @@
           element.timings = timings;
           flush(() => {
             const row = index + 1;
-            const node = element.shadowRoot.querySelectorAll(`:host > div`)[row];
+            const node = element.shadowRoot.querySelectorAll('div.row')[row];
             const display = getComputedStyle(node).display;
             assert.notEqual(display, 'none');
             done();
@@ -114,7 +114,7 @@
           element.timings = timings;
           flush(() => {
             const row = index + 1;
-            const node = element.shadowRoot.querySelectorAll(`:host > div`)[row];
+            const node = element.shadowRoot.querySelectorAll('div.row')[row];
             const label = node.querySelector('.timing-value');
             assert.equal(label.innerText, item[1] + ' ms');
             done();
