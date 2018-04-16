@@ -19,7 +19,7 @@ the License.
 <dom-module id="request-timings">
   <template strip-whitespace>
     <style>
-     :host {
+    :host {
       display: block;
       --paper-progress-height: var(--request-timings-progress-height, 12px);
       --paper-progress-container-color: var(--request-timings-progress-background, #F5F5F5);
@@ -68,7 +68,7 @@ the License.
     </style>
     <dom-if if="[[_hasStartTime]]">
       <template>
-        <div class="row">
+        <div class="row" data-type="start-time">
           <span class="label">Start date</span>:
           <date-time year="numeric" month="numeric" day="numeric" hour="numeric" minute="numeric" second="numeric" class="date-value" date="[[startTime]]"></date-time>
         </div>
@@ -76,7 +76,7 @@ the License.
     </dom-if>
     <dom-if if="[[_hasBlockedTime]]">
       <template>
-        <div class="row">
+        <div class="row" data-type="block-time">
           <div class="timing-label label">
             Queueing:
           </div>
@@ -87,7 +87,7 @@ the License.
     </dom-if>
     <dom-if if="[[_hasDnsTime]]">
       <template>
-        <div class="row">
+        <div class="row" data-type="dns-time">
           <div class="timing-label label">
             DNS Lookup:
           </div>
@@ -98,7 +98,7 @@ the License.
     </dom-if>
     <dom-if if="[[_hasConnectTime]]">
       <template>
-        <div class="row">
+        <div class="row" data-type="ttc-time">
           <div class="timing-label label">
             Time to connect:
           </div>
@@ -109,7 +109,7 @@ the License.
     </dom-if>
     <dom-if if="[[_hasSslTime]]">
       <template>
-        <div class="row">
+        <div class="row" data-type="ssl-time">
           <div class="timing-label label">
             SSL negotiation:
           </div>
@@ -120,7 +120,7 @@ the License.
     </dom-if>
     <dom-if if="[[_hasSendTime]]">
       <template>
-        <div class="row">
+        <div class="row" data-type="send-time">
           <div class="timing-label label">
             Send time:
           </div>
@@ -131,7 +131,7 @@ the License.
     </dom-if>
     <dom-if if="[[_hasWaitTime]]">
       <template>
-        <div class="row">
+        <div class="row" data-type="ttfb-time">
           <div class="timing-label label">
             Wait time (TTFB):
           </div>
@@ -142,7 +142,7 @@ the License.
     </dom-if>
     <dom-if if="[[_hasReceiveTime]]">
       <template>
-        <div class="row">
+        <div class="row" data-type="receive-time">
           <div class="timing-label label">
             Content download:
           </div>
@@ -210,7 +210,10 @@ the License.
         /**
          * A timings object as described in HAR 1.2 spec.
          */
-        timings: Object,
+        timings: {
+          type: Object,
+          observer: '_update'
+        },
         /**
          * Request stat time. It can be either Date object,
          * timestamp or a string representing the date.
@@ -355,35 +358,9 @@ the License.
         }
       };
     }
-    static get observers() {
-      return [
-        '_update(timings.*)'
-      ];
-    }
-
-    ready() {
-      super.ready();
-      this.isReady = true;
-      this._update();
-    }
-    // Resets the timeline.
-    reset() {
-      this._setFullTime(0);
-      this._setConnect(0);
-      this._setReceive(0);
-      this._setSend(0);
-      this._setWait(0);
-      this._setDns(-1);
-      this._setBlocked(-1);
-      this._setSsl(-1);
-      this.startTime = 0;
-    }
 
     // Updates the view after `timings` change.
     _update() {
-      if (!this.isReady) {
-        return;
-      }
       const timings = this.timings || {};
       let fullTime = 0;
       let connect = Number(timings.connect);
@@ -442,23 +419,15 @@ the License.
      * Round numeric value to presision defined in the `power` argument.
      *
      * @param {Number} value The value to round
-     * @param {Number} power The precision. 0 for integers. Default 4.
      * @return {Number} Rounded value.
      */
-    _round(value, power) {
+    _round(value) {
       value = Number(value);
       if (value !== value) {
         return 'unknown';
       }
-      power = +power;
-      if (power === 0) {
-        return Math.round(value);
-      }
-      if (!power || power !== power) {
-        power = 4;
-      }
-      power = Math.pow(10, power);
-      return Math.round(value * power) / power;
+      let factor = Math.pow(10, 4);
+      return Math.round(value * factor) / factor;
     }
     /**
      * Sums two HAR times.

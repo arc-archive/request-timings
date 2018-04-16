@@ -26,13 +26,14 @@
     "polymer": "Polymer/polymer#^2.0.0",
     "paper-progress": "PolymerElements/paper-progress#^2.0.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^2.0.3",
-    "date-time": "advanced-rest-client/date-time#^2.0.0"
+    "date-time": "advanced-rest-client/date-time#^2.0.3"
   },
   "devDependencies": {
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-    "iron-component-page": "^3.0.1"
+    "iron-component-page": "PolymerElements/iron-component-page#^3.0.1",
+    "arc-polyfills": "advanced-rest-client/arc-polyfills#^0.1.11"
   },
   "ignore": [
     "**/.*",

@@ -6,6 +6,7 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
     <link rel="import" href="../request-timings.html">
+    <link rel="import" href="../../arc-polyfills/arc-polyfills.html">
   </head>
   <body>
 
@@ -20,9 +21,9 @@
       let element;
       let timings;
 
-      setup(() => {
+      suiteSetup((done) => {
         element = fixture('basic');
-        timings = {
+        timings = element.timings = {
           startTime: 1483368432132,
           blocked: 7.751456734,
           dns: 279.3812349,
@@ -32,21 +33,10 @@
           wait: 649.8810009,
           receive: 1.7121211
         };
-      });
-
-      test('Sets default values', () => {
-        assert.equal(element.fullTime, 0);
-        assert.equal(element.connect, 0);
-        assert.equal(element.send, 0);
-        assert.equal(element.wait, 0);
-        assert.equal(element.receive, 0);
-        assert.equal(element.blocked, -1);
-        assert.equal(element.dns, -1);
-        assert.equal(element.ssl, -1);
+        flush(() => done());
       });
 
       test('Computes total time', () => {
-        element.timings = timings;
         // JS float computations can be tricky. The value is somethere
         // between this values.
         assert.isAbove(element.fullTime, 2455.18);
@@ -54,71 +44,89 @@
       });
 
       test('Sets blocked time', () => {
-        element.timings = timings;
         assert.equal(element.blocked, timings.blocked);
       });
 
       test('Sets dns time', () => {
-        element.timings = timings;
         assert.equal(element.dns, timings.dns);
       });
 
       test('Sets connect time', () => {
-        element.timings = timings;
         assert.equal(element.connect, timings.connect);
       });
 
       test('Sets ssl time', () => {
-        element.timings = timings;
         assert.equal(element.ssl, timings.ssl);
       });
 
       test('Sets send time', () => {
-        element.timings = timings;
         assert.equal(element.send, timings.send);
       });
 
       test('Sets wait time', () => {
-        element.timings = timings;
         assert.equal(element.wait, timings.wait);
       });
 
       test('Sets receive time', () => {
-        element.timings = timings;
         assert.equal(element.receive, timings.receive);
       });
 
-      ['Queueing', 'DNS Lookup', 'Time to connect', 'SSL negotiation', 'Send time', 'Wait time (TTFB)', 'Content download'].forEach((item, index) => {
-        test(`Renders ${item} row`, (done) => {
-          element.timings = timings;
-          flush(() => {
-            const row = index + 1;
-            const node = element.shadowRoot.querySelectorAll('div.row')[row];
-            const display = getComputedStyle(node).display;
-            assert.notEqual(display, 'none');
-            done();
-          });
+      [
+        ['Queueing', 'block-time'],
+        ['DNS Lookup', 'dns-time'],
+        ['Time to connect', 'ttc-time'],
+        ['SSL negotiation', 'ssl-time'],
+        ['Send time', 'send-time'],
+        ['Wait time (TTFB)', 'ttfb-time'],
+        ['Content download', 'receive-time']
+      ].forEach((item) => {
+        test(`Renders ${item[0]} row`, () => {
+          const node = element.shadowRoot.querySelector(`.row[data-type="${item[1]}"]`);
+          assert.ok(node);
         });
       });
 
       [
-        ['Queueing', '7.7515'],
-        ['DNS Lookup', 279.3812],
-        ['Time to connect', 883.1201],
-        ['SSL negotiation', 633.0517],
-        ['Send time', 0.29],
-        ['Wait time (TTFB)', 649.881],
-        ['Content download', 1.7121]
-      ].forEach((item, index) => {
-        test(`Rounds ${item[0]} value`, (done) => {
-          element.timings = timings;
-          flush(() => {
-            const row = index + 1;
-            const node = element.shadowRoot.querySelectorAll('div.row')[row];
-            const label = node.querySelector('.timing-value');
-            assert.equal(label.innerText, item[1] + ' ms');
-            done();
-          });
+        ['roundBlocked', 7.7515],
+        ['roundDns', 279.3812],
+        ['roundConnect', 883.1201],
+        ['roundSsl', 633.0517],
+        ['roundSend', 0.29],
+        ['roundWait', 649.881],
+        ['roundReceive', 1.7121]
+      ].forEach((item) => {
+        test(`${item[0]} is computed`, () => {
+          assert.equal(element[item[0]], item[1]);
+        });
+      });
+
+      [
+        ['Queueing', 'block-time', '7.7515'],
+        ['DNS Lookup', 'dns-time', 279.3812],
+        ['Time to connect', 'ttc-time', 883.1201],
+        ['SSL negotiation', 'ssl-time', 633.0517],
+        ['Send time', 'send-time', 0.29],
+        ['Wait time (TTFB)', 'ttfb-time', 649.881],
+        ['Content download', 'receive-time', 1.7121]
+      ].forEach((item) => {
+        test(`Rounds ${item[0]} value`, () => {
+          const node = element.shadowRoot.querySelector(`.row[data-type="${item[1]}"]`);
+          const label = node.querySelector('.timing-value');
+          assert.notEqual(label.innerText.indexOf(item[2] + ' ms'), -1);
+        });
+      });
+
+      [
+        ['_blockedProgressValue', 7.751456734],
+        ['_ttcProgressValue', 287.13269163399997],
+        ['_sslProgressValue', 1170.252815934],
+        ['_sendProgressValue', 1803.304548834],
+        ['_ttfbProgressValue', 1803.594572234],
+        ['_receiveProgressValue', 2453.475573134],
+        ['_receive2ProgressValue', 2455.187694234]
+      ].forEach((item) => {
+        test(`${item[0]} is computed`, () => {
+          assert.equal(element[item[0]], item[1]);
         });
       });
     });
