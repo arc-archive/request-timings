@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <link rel="import" href="../request-timings.html">
+    <link rel="import" href="../../arc-polyfills/arc-polyfills.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <request-timings></request-timings>
+      </template>
+    </test-fixture>
+
+    <script>
+    suite('basic', () => {
+      let element;
+      let timings;
+
+      suiteSetup((done) => {
+        element = fixture('basic');
+        timings = element.timings = {
+          startTime: 1483368432132,
+          blocked: 7.751456734,
+          dns: 279.3812349,
+          connect: 883.1201243,
+          ssl: 633.0517329,
+          send: 0.2900234,
+          wait: 649.8810009,
+          receive: 1.7121211
+        };
+        flush(() => done());
+      });
+
+      test('Computes total time', () => {
+        // JS float computations can be tricky. The value is somethere
+        // between this values.
+        assert.isAbove(element.fullTime, 2455.18);
+        assert.isBelow(element.fullTime, 2455.19);
+      });
+
+      test('Sets blocked time', () => {
+        assert.equal(element.blocked, timings.blocked);
+      });
+
+      test('Sets dns time', () => {
+        assert.equal(element.dns, timings.dns);
+      });
+
+      test('Sets connect time', () => {
+        assert.equal(element.connect, timings.connect);
+      });
+
+      test('Sets ssl time', () => {
+        assert.equal(element.ssl, timings.ssl);
+      });
+
+      test('Sets send time', () => {
+        assert.equal(element.send, timings.send);
+      });
+
+      test('Sets wait time', () => {
+        assert.equal(element.wait, timings.wait);
+      });
+
+      test('Sets receive time', () => {
+        assert.equal(element.receive, timings.receive);
+      });
+
+      [
+        ['Queueing', 'block-time'],
+        ['DNS Lookup', 'dns-time'],
+        ['Time to connect', 'ttc-time'],
+        ['SSL negotiation', 'ssl-time'],
+        ['Send time', 'send-time'],
+        ['Wait time (TTFB)', 'ttfb-time'],
+        ['Content download', 'receive-time']
+      ].forEach((item) => {
+        test(`Renders ${item[0]} row`, () => {
+          const node = element.shadowRoot.querySelector(`.row[data-type="${item[1]}"]`);
+          assert.ok(node);
+        });
+      });
+
+      [
+        ['roundBlocked', 7.7515],
+        ['roundDns', 279.3812],
+        ['roundConnect', 883.1201],
+        ['roundSsl', 633.0517],
+        ['roundSend', 0.29],
+        ['roundWait', 649.881],
+        ['roundReceive', 1.7121]
+      ].forEach((item) => {
+        test(`${item[0]} is computed`, () => {
+          assert.equal(element[item[0]], item[1]);
+        });
+      });
+
+      [
+        ['Queueing', 'block-time', '7.7515'],
+        ['DNS Lookup', 'dns-time', 279.3812],
+        ['Time to connect', 'ttc-time', 883.1201],
+        ['SSL negotiation', 'ssl-time', 633.0517],
+        ['Send time', 'send-time', 0.29],
+        ['Wait time (TTFB)', 'ttfb-time', 649.881],
+        ['Content download', 'receive-time', 1.7121]
+      ].forEach((item) => {
+        test(`Rounds ${item[0]} value`, () => {
+          const node = element.shadowRoot.querySelector(`.row[data-type="${item[1]}"]`);
+          const label = node.querySelector('.timing-value');
+          assert.notEqual(label.innerText.indexOf(item[2] + ' ms'), -1);
+        });
+      });
+
+      [
+        ['_blockedProgressValue', 7.751456734],
+        ['_ttcProgressValue', 287.13269163399997],
+        ['_sslProgressValue', 1170.252815934],
+        ['_sendProgressValue', 1803.304548834],
+        ['_ttfbProgressValue', 1803.594572234],
+        ['_receiveProgressValue', 2453.475573134],
+        ['_receive2ProgressValue', 2455.187694234]
+      ].forEach((item) => {
+        test(`${item[0]} is computed`, () => {
+          assert.equal(element[item[0]], item[1]);
+        });
+      });
+    });
+
+    a11ySuite('basic');
+    </script>
+
+  </body>
+</html>
