@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "description": "An element to display request timings information as a timeline to request / response",
   "devDependencies": {
-    "@polymer/gen-typescript-declarations": "^1.1.1"
+    "@polymer/gen-typescript-declarations": "^1.6.1"
   },
   "private": false,
   "main": "request-timings.html",
