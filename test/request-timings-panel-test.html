@@ -3,10 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
-    <link rel="import" href="../request-timings-panel.html">
-    <link rel="import" href="../../arc-polyfills/arc-polyfills.html">
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+
   </head>
   <body>
 
@@ -16,7 +19,9 @@
       </template>
     </test-fixture>
 
-    <script>
+    <script type="module">
+    import '../request-timings-panel.js';
+    // import { a11ySuite } from '../../../wct-browser-legacy/a11ySuite.js';
     suite('Panel', () => {
       let element;
       let timings;
@@ -43,7 +48,7 @@
           wait: 155.50400002393852,
           receive: 4.751000029500744,
           ssl: -1
-        },{
+        }, {
           startTime: '2017-01-02T16:22:26.212Z',
           blocked: 3.36500001139939,
           dns: -1,
@@ -103,7 +108,7 @@
       });
     });
 
-    a11ySuite('Panel');
+    // a11ySuite('Panel');
     </script>
 
   </body>
