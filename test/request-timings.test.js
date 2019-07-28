@@ -219,4 +219,26 @@ describe('<request-timings>', () => {
       });
     });
   });
+
+  describe('a11y', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+      element.timings = {
+        startTime: 1483368432132,
+        blocked: 7.751456734,
+        dns: 279.3812349,
+        connect: 883.1201243,
+        ssl: 633.0517329,
+        send: 0.2900234,
+        wait: 649.8810009,
+        receive: 1.7121211
+      };
+      await nextFrame();
+    });
+
+    it('is accessible', async () => {
+      await assert.isAccessible(element);
+    });
+  });
 });

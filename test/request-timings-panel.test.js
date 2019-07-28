@@ -166,4 +166,48 @@ describe('<request-timings-panel>', () => {
       assert.lengthOf(nodes, 1);
     });
   });
+
+  describe('a11y', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+      element.timings = {
+        startTime: 1483368432132,
+        blocked: 7.751456734,
+        dns: 279.3812349,
+        connect: 883.1201243,
+        ssl: 633.0517329,
+        send: 0.2900234,
+        wait: 649.8810009,
+        receive: 1.7121211
+      };
+      element.redirectTimings = [
+        {
+          startTime: '2017-01-02T16:22:26.212Z',
+          blocked: 10.697000019718,
+          dns: -1,
+          connect: -1,
+          send: 0.34099997719749986,
+          wait: 155.50400002393852,
+          receive: 4.751000029500744,
+          ssl: -1
+        },
+        {
+          startTime: '2017-01-02T16:22:26.212Z',
+          blocked: 3.36500001139939,
+          dns: -1,
+          connect: -1,
+          send: 0.06499997107311994,
+          wait: 138.7439999962225,
+          receive: 4.986000014469084,
+          ssl: -1
+        }
+      ];
+      await nextFrame();
+    });
+
+    it('is accessible', async () => {
+      await assert.isAccessible(element);
+    });
+  });
 });
