@@ -12,9 +12,7 @@
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-import {PolymerElement} from '@polymer/polymer/polymer-element.js';
-
-import {html} from '@polymer/polymer/lib/utils/html-tag.js';
+import {LitElement, html, css} from 'lit-element';
 
 declare namespace UiElements {
 
@@ -36,12 +34,7 @@ declare namespace UiElements {
    * ## Changes in version 2
    * - `redirects` property rendamed to `redirectTimings`
    */
-  class RequestTimingsPanel extends PolymerElement {
-
-    /**
-     * Computed value, if true it will display redirects details
-     */
-    readonly hasRedirects: boolean|null|undefined;
+  class RequestTimingsPanel extends LitElement {
 
     /**
      * An array of HAR 1.2 timings object.
@@ -57,12 +50,12 @@ declare namespace UiElements {
     timings: object|null|undefined;
 
     /**
-     * Calculated total request time (final response + redirectTimings).
+     * When set it renders mobile friendly view
      */
-    readonly requestTotalTime: number|null|undefined;
-    _computeHasRedirects(record: any): any;
-    _computeRequestTime(redirectsRecord: any, timingsRecord: any): any;
-    _computeIndexName(index: any): any;
+    narrow: boolean|null|undefined;
+    constructor();
+    render(): any;
+    _computeRequestTime(redirects: any, timings: any): any;
     _computeHarTime(har: any): any;
   }
 }

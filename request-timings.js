@@ -11,12 +11,9 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
-import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
-import '../../@polymer/polymer/lib/elements/dom-if.js';
-import '../../@polymer/paper-progress/paper-progress.js';
-import '../../@polymer/iron-flex-layout/iron-flex-layout.js';
-import '../../@advanced-rest-client/date-time/date-time.js';
+import { LitElement, html, css } from 'lit-element';
+import '@polymer/paper-progress/paper-progress.js';
+import '@advanced-rest-client/date-time/date-time.js';
 /* eslint-disable max-len */
 /**
  * An element to display request timings information as a timeline according to the HAR 1.2 spec.
@@ -66,148 +63,253 @@ import '../../@advanced-rest-client/date-time/date-time.js';
  * @demo demo/index.html
  * @memberof UiElements
  */
-class RequestTimings extends PolymerElement {
-  static get template() {
-    return html`<style>
-    :host {
-      display: block;
-      --paper-progress-height: var(--request-timings-progress-height, 12px);
-      --paper-progress-container-color: var(--request-timings-progress-background, #F5F5F5);
-      --paper-progress-active-color: var(--request-timings-progress-background, #F5F5F5);
-      --paper-progress-secondary-color: var(--request-timings-progress-color, #4a4);
-      @apply --request-timings;
-    }
+class RequestTimings extends LitElement {
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+        --paper-progress-height: var(--request-timings-progress-height, 12px);
+        --paper-progress-container-color: var(--request-timings-progress-background, #f5f5f5);
+        --paper-progress-active-color: var(--request-timings-progress-background, #f5f5f5);
+        --paper-progress-secondary-color: var(--request-timings-progress-color, #4a4);
+      }
 
-    .row {
-      @apply --layout-horizontal;
-      @apply --layout-center;
-    }
+      .row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
 
-    .flex,
-    paper-progress {
-      @apply --layout-flex;
-    }
+      paper-progress {
+        flex: 1;
+        flex-basis: 0.000000001px;
+      }
 
-    .label,
-    .date-value {
-      @apply --select-text;
-      @apply --form-label;
-    }
+      .label,
+      .date-value {
+        user-select: text;
+        cursor: text;
+      }
 
-    .timing-label {
-      width: var(--request-timings-label-width, 160px);
-      @apply --form-label;
-    }
+      .label {
+        margin-right: 8px;
+      }
 
-    .timing-value {
-      width: var(--request-timings-value-width, 120px);
-      text-align: right;
-      @apply --select-text;
-    }
+      .timing-label {
+        width: var(--request-timings-label-width, 160px);
+      }
 
-    .total {
-      margin-top: 12px;
-      padding-top: 12px;
-      font-weight: 500;
-      border-top: 2px var(--paper-grey-200, rgba(255, 0, 0, 0.74)) solid;
-    }
+      .timing-value {
+        width: var(--request-timings-value-width, 120px);
+        text-align: right;
+        user-select: text;
+        cursor: text;
+      }
 
-    .row.is-total {
-      @apply --layout-end-justified;
-    }
-    </style>
-    <dom-if if="[[_hasStartTime]]">
-      <template>
-        <div class="row" data-type="start-time">
-          <span class="label">Start date</span>:
-          <date-time year="numeric" month="numeric" day="numeric" hour="numeric" minute="numeric" second="numeric" class="date-value" date="[[startTime]]"></date-time>
-        </div>
-      </template>
-    </dom-if>
-    <dom-if if="[[_hasBlockedTime]]">
-      <template>
-        <div class="row" data-type="block-time">
-          <div class="timing-label label">
-            Queueing:
-          </div>
-          <paper-progress aria-label="Queueing time" value="0" secondary-progress="[[blocked]]" max="[[fullTime]]" step="0.0001"></paper-progress>
-          <span class="timing-value">[[roundBlocked]] ms</span>
-        </div>
-      </template>
-    </dom-if>
-    <dom-if if="[[_hasDnsTime]]">
-      <template>
-        <div class="row" data-type="dns-time">
-          <div class="timing-label label">
-            DNS Lookup:
-          </div>
-          <paper-progress aria-label="DNS lookup time" value="[[_blockedProgressValue]]" secondary-progress="[[_ttcProgressValue]]" max="[[fullTime]]" step="0.0001"></paper-progress>
-          <span class="timing-value">[[roundDns]] ms</span>
-        </div>
-      </template>
-    </dom-if>
-    <dom-if if="[[_hasConnectTime]]">
-      <template>
-        <div class="row" data-type="ttc-time">
-          <div class="timing-label label">
-            Time to connect:
-          </div>
-          <paper-progress aria-label="Time to connect" value="[[_ttcProgressValue]]" secondary-progress="[[_sslProgressValue]]" max="[[fullTime]]" step="0.0001"></paper-progress>
-          <span class="timing-value">[[roundConnect]] ms</span>
-        </div>
-      </template>
-    </dom-if>
-    <dom-if if="[[_hasSslTime]]">
-      <template>
-        <div class="row" data-type="ssl-time">
-          <div class="timing-label label">
-            SSL negotiation:
-          </div>
-          <paper-progress aria-label="SSL negotiation time" value="[[_sslProgressValue]]" secondary-progress="[[_sendProgressValue]]" max="[[fullTime]]" step="0.0001"></paper-progress>
-          <span class="timing-value">[[roundSsl]] ms</span>
-        </div>
-      </template>
-    </dom-if>
-    <dom-if if="[[_hasSendTime]]">
-      <template>
-        <div class="row" data-type="send-time">
-          <div class="timing-label label">
-            Send time:
-          </div>
-          <paper-progress aria-label="Send time" value="[[_sendProgressValue]]" secondary-progress="[[_ttfbProgressValue]]" max="[[fullTime]]" step="0.0001"></paper-progress>
-          <span class="timing-value">[[roundSend]] ms</span>
-        </div>
-      </template>
-    </dom-if>
-    <dom-if if="[[_hasWaitTime]]">
-      <template>
-        <div class="row" data-type="ttfb-time">
-          <div class="timing-label label">
-            Wait time (TTFB):
-          </div>
-          <paper-progress aria-label="Time to first byte" value="[[_ttfbProgressValue]]" secondary-progress="[[_receiveProgressValue]]" max="[[fullTime]]" step="0.0001"></paper-progress>
-          <span class="timing-value">[[roundWait]] ms</span>
-        </div>
-      </template>
-    </dom-if>
-    <dom-if if="[[_hasReceiveTime]]">
-      <template>
-        <div class="row" data-type="receive-time">
-          <div class="timing-label label">
-            Content download:
-          </div>
-          <paper-progress aria-label="Receiving time" value="[[_receiveProgressValue]]" secondary-progress="[[_receive2ProgressValue]]" max="[[fullTime]]" step="0.0001"></paper-progress>
-          <span class="timing-value">[[roundReceive]] ms</span>
-        </div>
-      </template>
-    </dom-if>
-    <div class="row is-total">
-      <span class="timing-value total">[[roundFullTime]] ms</span>
-    </div>`;
+      .total {
+        margin-top: 12px;
+        padding-top: 12px;
+        font-weight: 500;
+        border-top: 2px var(--paper-grey-200, rgba(255, 0, 0, 0.74)) solid;
+      }
+
+      .row.is-total {
+        justify-content: flex-end;
+      }
+
+      :host([narrow]) .row {
+        flex-direction: column;
+        align-items: start;
+        margin: 8px 0;
+      }
+
+      :host([narrow]) paper-progress {
+        width: 100%;
+        flex: auto;
+        order: 3;
+      }
+
+      :host([narrow]) .timing-value {
+        text-align: left;
+        order: 2;
+      }
+
+      :host([narrow]) .timing-label {
+        order: 1;
+        width: auto;
+      }
+    `;
   }
 
-  static get is() {
-    return 'request-timings';
+  render() {
+    const {
+      _startTime: startTime,
+      _blocked: blocked,
+      _fullTime: fullTime,
+      _dns: dns,
+      _connect: connect,
+      _ssl: ssl,
+      _send: send,
+      _wait: wait,
+      _receive: receive
+    } = this;
+    const hasStartTime = this._hasValue(startTime);
+    const hasBlockedTime = this._hasValue(blocked);
+    const hasDnsTime = this._hasValue(dns);
+    const hasConnectTime = this._hasValue(connect);
+    const hasSslTime = this._hasValue(ssl);
+    const hasSendTime = this._hasValue(send);
+    const hasWaitTime = this._hasValue(wait);
+    const hasReceiveTime = this._hasValue(receive);
+    const blockedProgressValue = this._computeSum(blocked);
+    const ttcProgressValue = this._computeSum(blocked, dns);
+    const sslProgressValue = this._computeSum(ttcProgressValue, connect);
+    const sendProgressValue = this._computeSum(sslProgressValue, ssl);
+    const ttfbProgressValue = this._computeSum(sendProgressValue, send);
+    const receiveProgressValue = this._computeSum(ttfbProgressValue, wait);
+    const receive2ProgressValue = this._computeSum(receiveProgressValue, receive);
+
+    return html`
+      ${hasStartTime
+        ? html`
+            <div class="row" data-type="start-time">
+              <span class="label">Start date:</span>
+              <date-time
+                year="numeric"
+                month="numeric"
+                day="numeric"
+                hour="numeric"
+                minute="numeric"
+                second="numeric"
+                class="date-value"
+                .date="${startTime}"
+              ></date-time>
+            </div>
+          `
+        : undefined}
+      ${hasBlockedTime
+        ? html`
+            <div class="row" data-type="block-time">
+              <div class="timing-label label">
+                Queueing:
+              </div>
+              <paper-progress
+                aria-label="Queueing time"
+                value="0"
+                .secondaryProgress="${blocked}"
+                .max="${fullTime}"
+                step="0.0001"
+              ></paper-progress>
+              <span class="timing-value">${this._round(blocked)} ms</span>
+            </div>
+          `
+        : undefined}
+      ${hasDnsTime
+        ? html`
+            <div class="row" data-type="dns-time">
+              <div class="timing-label label">
+                DNS Lookup:
+              </div>
+              <paper-progress
+                aria-label="DNS lookup time"
+                .value="${blockedProgressValue}"
+                .secondaryProgress="${ttcProgressValue}"
+                .max="${fullTime}"
+                step="0.0001"
+              ></paper-progress>
+              <span class="timing-value">${this._round(dns)} ms</span>
+            </div>
+          `
+        : undefined}
+      ${hasConnectTime
+        ? html`
+            <div class="row" data-type="ttc-time">
+              <div class="timing-label label">
+                Time to connect:
+              </div>
+              <paper-progress
+                aria-label="Time to connect"
+                .value="${ttcProgressValue}"
+                .secondaryProgress="${sslProgressValue}"
+                .max="${fullTime}"
+                step="0.0001"
+              ></paper-progress>
+              <span class="timing-value">${this._round(connect)} ms</span>
+            </div>
+          `
+        : undefined}
+      ${hasSslTime
+        ? html`
+            <div class="row" data-type="ssl-time">
+              <div class="timing-label label">
+                SSL negotiation:
+              </div>
+              <paper-progress
+                aria-label="SSL negotiation time"
+                .value="${sslProgressValue}"
+                .secondaryProgress="${sendProgressValue}"
+                .max="${fullTime}"
+                step="0.0001"
+              ></paper-progress>
+              <span class="timing-value">${this._round(ssl)} ms</span>
+            </div>
+          `
+        : undefined}
+      ${hasSendTime
+        ? html`
+            <div class="row" data-type="send-time">
+              <div class="timing-label label">
+                Send time:
+              </div>
+              <paper-progress
+                aria-label="Send time"
+                value="${sendProgressValue}"
+                .secondaryProgress="${ttfbProgressValue}"
+                .max="${fullTime}"
+                step="0.0001"
+              ></paper-progress>
+              <span class="timing-value">${this._round(send)} ms</span>
+            </div>
+          `
+        : undefined}
+      ${hasWaitTime
+        ? html`
+            <div class="row" data-type="ttfb-time">
+              <div class="timing-label label">
+                Wait time (TTFB):
+              </div>
+              <paper-progress
+                aria-label="Time to first byte"
+                .value="${ttfbProgressValue}"
+                .secondaryProgress="${receiveProgressValue}"
+                .max="${fullTime}"
+                step="0.0001"
+              ></paper-progress>
+              <span class="timing-value">${this._round(wait)} ms</span>
+            </div>
+          `
+        : undefined}
+      ${hasReceiveTime
+        ? html`
+            <div class="row" data-type="receive-time">
+              <div class="timing-label label">
+                Content download:
+              </div>
+              <paper-progress
+                aria-label="Receiving time"
+                .value="${receiveProgressValue}"
+                .secondaryProgress="${receive2ProgressValue}"
+                .max="${fullTime}"
+                step="0.0001"
+              ></paper-progress>
+              <span class="timing-value">${this._round(receive)} ms</span>
+            </div>
+          `
+        : undefined}
+      <div class="row is-total">
+        <span class="timing-value total">${this._round(fullTime)} ms</span>
+      </div>
+    `;
   }
 
   static get properties() {
@@ -215,153 +317,50 @@ class RequestTimings extends PolymerElement {
       /**
        * A timings object as described in HAR 1.2 spec.
        */
-      timings: {
-        type: Object,
-        observer: '_update'
-      },
+      timings: { type: Object },
       /**
        * Request stat time. It can be either Date object,
        * timestamp or a string representing the date.
        *
        * If the `timings` property contains the `startTime` property it
        * will be overwritten.
+       *
+       * @type {String|Date}
        */
-      startTime: String,
+      _startTime: {},
       /**
        * Computed value. Calculated full time of the request and response
        */
-      fullTime: {
-        type: Number,
-        readOnly: true
-      },
-      roundFullTime: {
-        type: Number,
-        computed: '_round(fullTime)'
-      },
+      _fullTime: { type: Number },
       // Computed value. Time required to establish the connection
-      connect: {
-        type: Number,
-        readOnly: true
-      },
-      roundConnect: {
-        type: Number,
-        computed: '_round(connect)'
-      },
+      _connect: { type: Number },
+
       // Computed value. Time of receiving data from the remote machine.
-      receive: {
-        type: Number,
-        readOnly: true
-      },
-      roundReceive: {
-        type: Number,
-        computed: '_round(receive)'
-      },
+      _receive: { type: Number },
       // Computed value. Time to send data to the remote machine.
-      send: {
-        type: Number,
-        readOnly: true
-      },
-      roundSend: {
-        type: Number,
-        computed: '_round(send)'
-      },
+      _send: { type: Number },
       // Computed value. Wait time for the first byte to arrive.
-      wait: {
-        type: Number,
-        readOnly: true
-      },
-      roundWait: {
-        type: Number,
-        computed: '_round(wait)'
-      },
+      _wait: { type: Number },
       // Computed value. Time spent in a queue waiting for a network connection
-      blocked: {
-        type: Number,
-        readOnly: true
-      },
-      roundBlocked: {
-        type: Number,
-        computed: '_round(blocked)'
-      },
+      _blocked: { type: Number },
       // Computed value. DNS resolution time.
-      dns: {
-        type: Number,
-        readOnly: true
-      },
-      roundDns: {
-        type: Number,
-        computed: '_round(dns)'
-      },
+      _dns: { type: Number },
       // Computed value. Time required for SSL/TLS negotiation.
-      ssl: {
-        type: Number,
-        readOnly: true
-      },
-      roundSsl: {
-        type: Number,
-        computed: '_round(ssl)'
-      },
-      _hasStartTime: {
-        type: Boolean,
-        computed: '_hasValue(startTime)'
-      },
-      _hasBlockedTime: {
-        type: Boolean,
-        computed: '_hasValue(blocked)'
-      },
-      _hasDnsTime: {
-        type: Boolean,
-        computed: '_hasValue(dns)'
-      },
-      _hasConnectTime: {
-        type: Boolean,
-        computed: '_hasValue(connect)'
-      },
-      _hasSslTime: {
-        type: Boolean,
-        computed: '_hasValue(ssl)'
-      },
-      _hasSendTime: {
-        type: Boolean,
-        computed: '_hasValue(send)'
-      },
-      _hasWaitTime: {
-        type: Boolean,
-        computed: '_hasValue(wait)'
-      },
-      _hasReceiveTime: {
-        type: Boolean,
-        computed: '_hasValue(receive)'
-      },
-      _blockedProgressValue: {
-        type: Number,
-        computed: '_computeSum(blocked)'
-      },
-      _ttcProgressValue: {
-        type: Number,
-        computed: '_computeSum(blocked, dns)'
-      },
-      _sslProgressValue: {
-        type: Number,
-        computed: '_computeSum(_ttcProgressValue, connect)'
-      },
-      _sendProgressValue: {
-        type: Number,
-        computed: '_computeSum(_sslProgressValue, ssl)'
-      },
-      _ttfbProgressValue: {
-        type: Number,
-        computed: '_computeSum(_sendProgressValue, send)'
-      },
-      _receiveProgressValue: {
-        type: Number,
-        computed: '_computeSum(_ttfbProgressValue, wait)'
-      },
-      _receive2ProgressValue: {
-        type: Number,
-        computed: '_computeSum(_receiveProgressValue, receive)'
-      }
+      _ssl: { type: Number }
     };
+  }
+
+  get timings() {
+    return this._timings;
+  }
+
+  set timings(value) {
+    const old = this._timings;
+    if (old === value) {
+      return;
+    }
+    this._timings = value;
+    this._update(value);
   }
 
   // Updates the view after `timings` change.
@@ -406,18 +405,18 @@ class RequestTimings extends PolymerElement {
     if (ssl > 0) {
       fullTime += ssl;
     }
-    this._setFullTime(fullTime);
-    this._setConnect(connect);
-    this._setReceive(receive);
-    this._setSend(send);
-    this._setWait(wait);
-    this._setDns(dns);
-    this._setBlocked(blocked);
-    this._setSsl(ssl);
+    this._fullTime = fullTime;
+    this._connect = connect;
+    this._receive = receive;
+    this._send = send;
+    this._wait = wait;
+    this._dns = dns;
+    this._blocked = blocked;
+    this._ssl = ssl;
     if (timings.startTime) {
-      this.set('startTime', timings.startTime);
+      this._startTime = timings.startTime;
     } else {
-      this.set('startTime', this.startTime || -1);
+      this._startTime = this._startTime || -1;
     }
   }
   /**
@@ -431,7 +430,7 @@ class RequestTimings extends PolymerElement {
     if (value !== value) {
       return 'unknown';
     }
-    let factor = Math.pow(10, 4);
+    const factor = Math.pow(10, 4);
     return Math.round(value * factor) / factor;
   }
   /**
@@ -471,4 +470,4 @@ class RequestTimings extends PolymerElement {
     return num > 0;
   }
 }
-window.customElements.define(RequestTimings.is, RequestTimings);
+window.customElements.define('request-timings', RequestTimings);

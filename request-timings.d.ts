@@ -12,9 +12,7 @@
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-import {PolymerElement} from '@polymer/polymer/polymer-element.js';
-
-import {html} from '@polymer/polymer/lib/utils/html-tag.js';
+import {LitElement, html, css} from 'lit-element';
 
 declare namespace UiElements {
 
@@ -61,7 +59,7 @@ declare namespace UiElements {
    * `--request-timings-label-width` | Width of the label | `160px`
    * `--request-timings-value-width` | Width of the value column | `120px`
    */
-  class RequestTimings extends PolymerElement {
+  class RequestTimings extends LitElement {
 
     /**
      * A timings object as described in HAR 1.2 spec.
@@ -75,70 +73,49 @@ declare namespace UiElements {
      * If the `timings` property contains the `startTime` property it
      * will be overwritten.
      */
-    startTime: string|null|undefined;
+    _startTime: String|Date|null;
 
     /**
      * Computed value. Calculated full time of the request and response
      */
-    readonly fullTime: number|null|undefined;
-    readonly roundFullTime: number|null|undefined;
+    _fullTime: number|null|undefined;
 
     /**
      * Computed value. Time required to establish the connection
      */
-    readonly connect: number|null|undefined;
-    readonly roundConnect: number|null|undefined;
+    _connect: number|null|undefined;
 
     /**
      * Computed value. Time of receiving data from the remote machine.
      */
-    readonly receive: number|null|undefined;
-    readonly roundReceive: number|null|undefined;
+    _receive: number|null|undefined;
 
     /**
      * Computed value. Time to send data to the remote machine.
      */
-    readonly send: number|null|undefined;
-    readonly roundSend: number|null|undefined;
+    _send: number|null|undefined;
 
     /**
      * Computed value. Wait time for the first byte to arrive.
      */
-    readonly wait: number|null|undefined;
-    readonly roundWait: number|null|undefined;
+    _wait: number|null|undefined;
 
     /**
      * Computed value. Time spent in a queue waiting for a network connection
      */
-    readonly blocked: number|null|undefined;
-    readonly roundBlocked: number|null|undefined;
+    _blocked: number|null|undefined;
 
     /**
      * Computed value. DNS resolution time.
      */
-    readonly dns: number|null|undefined;
-    readonly roundDns: number|null|undefined;
+    _dns: number|null|undefined;
 
     /**
      * Computed value. Time required for SSL/TLS negotiation.
      */
-    readonly ssl: number|null|undefined;
-    readonly roundSsl: number|null|undefined;
-    readonly _hasStartTime: boolean|null|undefined;
-    readonly _hasBlockedTime: boolean|null|undefined;
-    readonly _hasDnsTime: boolean|null|undefined;
-    readonly _hasConnectTime: boolean|null|undefined;
-    readonly _hasSslTime: boolean|null|undefined;
-    readonly _hasSendTime: boolean|null|undefined;
-    readonly _hasWaitTime: boolean|null|undefined;
-    readonly _hasReceiveTime: boolean|null|undefined;
-    readonly _blockedProgressValue: number|null|undefined;
-    readonly _ttcProgressValue: number|null|undefined;
-    readonly _sslProgressValue: number|null|undefined;
-    readonly _sendProgressValue: number|null|undefined;
-    readonly _ttfbProgressValue: number|null|undefined;
-    readonly _receiveProgressValue: number|null|undefined;
-    readonly _receive2ProgressValue: number|null|undefined;
+    _ssl: number|null|undefined;
+    constructor();
+    render(): any;
 
     /**
      * Updates the view after `timings` change.

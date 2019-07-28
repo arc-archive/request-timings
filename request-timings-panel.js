@@ -11,11 +11,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
-import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
-import '../../@polymer/polymer/lib/elements/dom-if.js';
-import '../../@polymer/polymer/lib/elements/dom-repeat.js';
-import '../../@polymer/iron-flex-layout/iron-flex-layout.js';
+import { LitElement, html, css } from 'lit-element';
 import './request-timings.js';
 /* eslint-disable max-len */
 /**
@@ -41,129 +37,134 @@ import './request-timings.js';
  * @demo demo/index.html
  * @memberof UiElements
  */
-class RequestTimingsPanel extends PolymerElement {
-  static get template() {
+class RequestTimingsPanel extends LitElement {
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+      }
+
+      .status-row,
+      .timings-row {
+        flex-direction: row;
+        display: flex;
+        align-items: center;
+        min-height: 56px;
+      }
+
+      .status-row {
+        flex-direction: row;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .sub-title {
+        font-size: var(--arc-font-subhead-font-size);
+        font-weight: var(--arc-font-subhead-font-weight);
+        line-height: var(--arc-font-subhead-line-height);
+      }
+
+      .status-label {
+        width: 60px;
+        font-size: var(--request-timings-panel-timing-total-size, 16px);
+        font-weight: var(--request-timings-panel-timing-total-weigth, 400);
+      }
+
+      .text {
+        user-select: text;
+        cursor: text;
+      }
+
+      .redirect-value {
+        margin-top: 12px;
+        flex: 1;
+        flex-basis: 0.000000001px;
+      }
+
+      :host([narrow]) .timings-row {
+        flex-direction: column;
+        align-items: start;
+        margin: 20px 0;
+      }
+
+      :host([narrow]) .redirect-value {
+        width: 100%;
+        flex: auto;
+      }
+
+      :host([narrow]) .status-row {
+        justify-content: flex-start;
+      }
+    `;
+  }
+
+  render() {
+    const { redirectTimings, timings, narrow } = this;
+    const hasRedirects = !!(redirectTimings && redirectTimings.length);
+    const requestTotalTime = this._computeRequestTime(redirectTimings, timings);
+
     return html`
-    <style>
-     :host {
-      display: block;
-      @apply --request-timings-panel;
-    }
-
-    .status-row,
-    .timings-row {
-      @apply --layout-horizontal;
-      @apply --layout-center;
-      min-height: 56px;
-    }
-
-    .status-row {
-      @apply --layout-horizontal;
-      @apply --layout-end-justified;
-    }
-
-    .sub-title {
-      @apply --arc-font-subhead;
-    }
-
-    .status-label {
-      width: 60px;
-      font-size: var(--request-timings-panel-timing-total-size, 16px);
-      font-weight: var(--request-timings-panel-timing-total-weigth, 400);
-      @apply --arc-font-subhead;
-    }
-
-    .text {
-      -webkit-user-select: text;
-      cursor: text;
-    }
-
-    .redirect-value {
-      margin-top: 12px;
-      @apply --layout-flex;
-    }
-    </style>
-    <template is="dom-if" if="[[hasRedirects]]">
-      <section class="redirects">
-        <h3 class="sub-title">Redirects</h3>
-        <template is="dom-repeat" items="[[redirectTimings]]">
-          <div class="timings-row">
-            <div class="status-label text">
-              #<span>{{_computeIndexName(index)}}</span>
-            </div>
-            <div class="redirect-value">
-              <request-timings timings="[[item]]"></request-timings>
-            </div>
-          </div>
-        </template>
-        <h3 class="sub-title">Final request</h3>
-        <div class="timings-row">
-          <div class="redirect-value">
-            <request-timings timings="[[timings]]"></request-timings>
-          </div>
-        </div>
-        <div class="status-row">
-          <div class="flex"></div>
-          <span class="timing-value total text">[[requestTotalTime]] ms</span>
-        </div>
-      </section>
-    </template>
-    <template is="dom-if" if="[[!hasRedirects]]">
-      <request-timings timings="[[timings]]"></request-timings>
-    </template>
-`;
+      ${hasRedirects
+        ? html`
+            <section class="redirects">
+              <h3 class="sub-title">Redirects</h3>
+              ${redirectTimings.map(
+                (item, index) => html`
+                  <div class="timings-row">
+                    <div class="status-label text">#<span>${index + 1}</span></div>
+                    <div class="redirect-value">
+                      <request-timings .timings="${item}" ?narrow="${narrow}"></request-timings>
+                    </div>
+                  </div>
+                `
+              )}
+              <h3 class="sub-title">Final request</h3>
+              <div class="timings-row">
+                <div class="redirect-value">
+                  <request-timings .timings="${timings}" ?narrow="${narrow}"></request-timings>
+                </div>
+              </div>
+              <div class="status-row">
+                <div class="flex"></div>
+                <span class="timing-value total text">Total: ${requestTotalTime} ms</span>
+              </div>
+            </section>
+          `
+        : html`
+            <request-timings .timings="${timings}" ?narrow="${narrow}"></request-timings>
+          `}
+    `;
   }
 
   static get properties() {
     return {
-      // Computed value, if true it will display redirects details
-      hasRedirects: {
-        type: Boolean,
-        value: false,
-        readOnly: true,
-        computed: '_computeHasRedirects(redirectTimings.*)'
-      },
       /**
        * An array of HAR 1.2 timings object.
        * It should contain a timings objects for any redirect object during
        * the request.
        * List should be arelady ordered by the time of occurence.
        */
-      redirectTimings: Array,
+      redirectTimings: { type: Array },
       // The request / response HAR timings.
-      timings: Object,
+      timings: { type: Object },
       /**
-       * Calculated total request time (final response + redirectTimings).
+       * When set it renders mobile friendly view
        */
-      requestTotalTime: {
-        type: Number,
-        value: 0,
-        computed: '_computeRequestTime(redirectTimings.*, timings.*)'
-      }
+      narrow: { type: Boolean, reflect: true }
     };
   }
 
-  _computeHasRedirects(record) {
-    return !!(record && record.base && record.base.length);
-  }
-
-  _computeRequestTime(redirectsRecord, timingsRecord) {
-    const redirects = redirectsRecord.base;
-    const timings = timingsRecord.base;
+  _computeRequestTime(redirects, timings) {
     let time = 0;
     if (redirects && redirects.length) {
-      redirects.forEach((timing) => time += this._computeHarTime(timing));
+      redirects.forEach((timing) => (time += this._computeHarTime(timing)));
     }
-    let add = this._computeHarTime(timings);
+    const add = this._computeHarTime(timings);
     if (add) {
       time += add;
     }
     time = Math.round(time * 10000) / 10000;
     return time;
-  }
-
-  _computeIndexName(index) {
-    return index + 1;
   }
 
   _computeHarTime(har) {
