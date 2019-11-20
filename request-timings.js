@@ -64,7 +64,7 @@ import '@advanced-rest-client/date-time/date-time.js';
  * @memberof UiElements
  */
 class RequestTimings extends LitElement {
-  static get styles() {
+  get styles() {
     return css`
       :host {
         display: block;
@@ -169,7 +169,7 @@ class RequestTimings extends LitElement {
     const receiveProgressValue = this._computeSum(ttfbProgressValue, wait);
     const receive2ProgressValue = this._computeSum(receiveProgressValue, receive);
 
-    return html`
+    return html`<style>${this.styles}</style>
       ${hasStartTime
         ? html`
             <div class="row" data-type="start-time">

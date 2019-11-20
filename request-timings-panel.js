@@ -38,7 +38,7 @@ import './request-timings.js';
  * @memberof UiElements
  */
 class RequestTimingsPanel extends LitElement {
-  static get styles() {
+  get styles() {
     return css`
       :host {
         display: block;
@@ -103,7 +103,7 @@ class RequestTimingsPanel extends LitElement {
     const hasRedirects = !!(redirectTimings && redirectTimings.length);
     const requestTotalTime = this._computeRequestTime(redirectTimings, timings);
 
-    return html`
+    return html`<style>${this.styles}</style>
       ${hasRedirects
         ? html`
             <section class="redirects">
