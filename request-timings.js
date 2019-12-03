@@ -169,7 +169,10 @@ class RequestTimings extends LitElement {
     const receiveProgressValue = this._computeSum(ttfbProgressValue, wait);
     const receive2ProgressValue = this._computeSum(receiveProgressValue, receive);
 
-    return html`<style>${this.styles}</style>
+    return html`
+      <style>
+        ${this.styles}
+      </style>
       ${hasStartTime
         ? html`
             <div class="row" data-type="start-time">
@@ -186,7 +189,7 @@ class RequestTimings extends LitElement {
               ></date-time>
             </div>
           `
-        : undefined}
+        : ''}
       ${hasBlockedTime
         ? html`
             <div class="row" data-type="block-time">
@@ -203,7 +206,7 @@ class RequestTimings extends LitElement {
               <span class="timing-value">${this._round(blocked)} ms</span>
             </div>
           `
-        : undefined}
+        : ''}
       ${hasDnsTime
         ? html`
             <div class="row" data-type="dns-time">
@@ -220,7 +223,7 @@ class RequestTimings extends LitElement {
               <span class="timing-value">${this._round(dns)} ms</span>
             </div>
           `
-        : undefined}
+        : ''}
       ${hasConnectTime
         ? html`
             <div class="row" data-type="ttc-time">
@@ -237,7 +240,7 @@ class RequestTimings extends LitElement {
               <span class="timing-value">${this._round(connect)} ms</span>
             </div>
           `
-        : undefined}
+        : ''}
       ${hasSslTime
         ? html`
             <div class="row" data-type="ssl-time">
@@ -254,7 +257,7 @@ class RequestTimings extends LitElement {
               <span class="timing-value">${this._round(ssl)} ms</span>
             </div>
           `
-        : undefined}
+        : ''}
       ${hasSendTime
         ? html`
             <div class="row" data-type="send-time">
@@ -271,7 +274,7 @@ class RequestTimings extends LitElement {
               <span class="timing-value">${this._round(send)} ms</span>
             </div>
           `
-        : undefined}
+        : ''}
       ${hasWaitTime
         ? html`
             <div class="row" data-type="ttfb-time">
@@ -288,7 +291,7 @@ class RequestTimings extends LitElement {
               <span class="timing-value">${this._round(wait)} ms</span>
             </div>
           `
-        : undefined}
+        : ''}
       ${hasReceiveTime
         ? html`
             <div class="row" data-type="receive-time">
@@ -305,7 +308,7 @@ class RequestTimings extends LitElement {
               <span class="timing-value">${this._round(receive)} ms</span>
             </div>
           `
-        : undefined}
+        : ''}
       <div class="row is-total">
         <span class="timing-value total">${this._round(fullTime)} ms</span>
       </div>
