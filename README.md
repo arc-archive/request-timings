@@ -4,18 +4,19 @@
 
 [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/@advanced-rest-client/request-timings)
 
-## request-timings
+# request-timings
 
 An element to render request timings information from HAR 1.2  timings object
 
-### API components
+## Deprecation notice
 
-This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
+This component is deprecated. Use `@advanced-rest-client/arc-response` instead.
 
 ## Usage
 
 ### Installation
-```
+
+```sh
 npm install --save @advanced-rest-client/request-timings
 ```
 
